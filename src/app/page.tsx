@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -16,6 +16,33 @@ const impactMultipliers = {
 
 export default function Home() {
   const [amount, setAmount] = useState(250000);
+  const scrollRef = useRef(null);
+
+  const handleMouseDown = (e) => {
+    const el = scrollRef.current;
+    el.isDown = true;
+    el.startX = e.pageX - el.offsetLeft;
+    el.scrollLeftStart = el.scrollLeft;
+  };
+
+  const handleMouseLeave = () => {
+    const el = scrollRef.current;
+    el.isDown = false;
+  };
+
+  const handleMouseUp = () => {
+    const el = scrollRef.current;
+    el.isDown = false;
+  };
+
+  const handleMouseMove = (e) => {
+    const el = scrollRef.current;
+    if (!el.isDown) return;
+    e.preventDefault();
+    const x = e.pageX - el.offsetLeft;
+    const walk = (x - el.startX) * 2;
+    el.scrollLeft = el.scrollLeftStart - walk;
+  };
 
   return (
     <div className="p-6 bg-[#f3f9f6] text-gray-900 min-h-screen">
@@ -40,12 +67,21 @@ export default function Home() {
           <p className="mt-2 text-sm">${amount.toLocaleString()}</p>
 
           <Tabs defaultValue="hpv" className="mt-6">
-            <TabsList>
-              <TabsTrigger value="hpv">HPV Vaccine</TabsTrigger>
-              <TabsTrigger value="mms">Prenatal Vitamins</TabsTrigger>
-              <TabsTrigger value="malaria">Malaria Prevention</TabsTrigger>
-              <TabsTrigger value="readingGlasses">Reading Glasses</TabsTrigger>
-            </TabsList>
+            <div
+              ref={scrollRef}
+              onMouseDown={handleMouseDown}
+              onMouseLeave={handleMouseLeave}
+              onMouseUp={handleMouseUp}
+              onMouseMove={handleMouseMove}
+              className="overflow-x-auto whitespace-nowrap -mx-2 px-2 cursor-grab active:cursor-grabbing scrollbar-hide"
+            >
+              <TabsList className="inline-flex gap-2">
+                <TabsTrigger value="hpv">HPV Vaccine</TabsTrigger>
+                <TabsTrigger value="mms">Prenatal Vitamins</TabsTrigger>
+                <TabsTrigger value="malaria">Malaria Prevention</TabsTrigger>
+                <TabsTrigger value="readingGlasses">Reading Glasses</TabsTrigger>
+              </TabsList>
+            </div>
             <TabsContent value="hpv">
               <p className="mt-4">Your gift could prevent <strong>{(amount * impactMultipliers.hpv).toFixed(0)}</strong> cervical cancer deaths in Malawi.</p>
             </TabsContent>

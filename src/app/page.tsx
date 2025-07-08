@@ -16,32 +16,35 @@ const impactMultipliers = {
 
 export default function Home() {
   const [amount, setAmount] = useState(250000);
-  const scrollRef = useRef(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseDown = (e) => {
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = scrollRef.current;
-    el.isDown = true;
-    el.startX = e.pageX - el.offsetLeft;
-    el.scrollLeftStart = el.scrollLeft;
+    if (!el) return;
+    (el as any).isDown = true;
+    (el as any).startX = e.pageX - el.offsetLeft;
+    (el as any).scrollLeftStart = el.scrollLeft;
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = scrollRef.current;
-    el.isDown = false;
+    if (!el) return;
+    (el as any).isDown = false;
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = scrollRef.current;
-    el.isDown = false;
+    if (!el) return;
+    (el as any).isDown = false;
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = scrollRef.current;
-    if (!el.isDown) return;
+    if (!el || !(el as any).isDown) return;
     e.preventDefault();
     const x = e.pageX - el.offsetLeft;
-    const walk = (x - el.startX) * 2;
-    el.scrollLeft = el.scrollLeftStart - walk;
+    const walk = (x - (el as any).startX) * 2;
+    el.scrollLeft = (el as any).scrollLeftStart - walk;
   };
 
   return (
